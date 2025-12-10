@@ -42,3 +42,17 @@ body {
     box-shadow: 0 0 5px #00f3ff, inset 0 0 5px #00f3ff;
   }
 }
+/* Neon text glow animation */
+@keyframes text-glow {
+  0%, 100% { 
+    filter: drop-shadow(0 0 3px rgba(0, 243, 255, 0.5));
+  }
+  50% { 
+    filter: drop-shadow(0 0 6px rgba(0, 243, 255, 0.8)) 
+            drop-shadow(0 0 12px rgba(155, 89, 255, 0.4));
+  }
+}
+
+.neon-text-glow {
+  animation: text-glow 2s ease-in-out infinite;
+}
