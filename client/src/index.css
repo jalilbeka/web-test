@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+:root {
+  font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #050510;
+  color: #ffffff;
+  overflow-x: hidden;
+  cursor: none;
+  /* We will use a custom cursor */
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050510;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00f3ff;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00c3cc;
+}
+
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.7), 0 0 20px rgba(0, 243, 255, 0.5);
+  }
+
+  .neon-border {
+    box-shadow: 0 0 5px #00f3ff, inset 0 0 5px #00f3ff;
+  }
+}
