@@ -95,7 +95,13 @@ const Contact = () => {
                             type="submit"
                             className="w-full bg-gradient-to-r from-neonCyan to-neonViolet text-black font-bold py-4 rounded-lg uppercase tracking-wider hover:opacity-90 transition-opacity relative overflow-hidden"
                         >
-                            <span className="relative z-10">{status || 'Send Message'}</span>
+                            <span className="relative z-10">
+  <span className="text-black font-bold tracking-wider relative inline-block">
+    {status || 'SEND MESSAGE'}
+    {/* Subtle glow behind the text */}
+    <span className="absolute inset-0 text-transparent bg-clip-text bg-gradient-to-r from-neonCyan/60 to-neonViolet/60 blur-[2px] opacity-70"></span>
+  </span>
+</span>
                         </motion.button>
                     </div>
                 </form>
