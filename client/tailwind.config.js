@@ -19,3 +19,13 @@ export default {
     },
     plugins: [],
 }
+// In client/tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      dropShadow: {
+        'glow': '0 0 10px rgba(0, 243, 255, 0.9)',
+      }
+    }
+  }
+}
