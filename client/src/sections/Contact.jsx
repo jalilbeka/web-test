@@ -19,21 +19,25 @@ const Contact = () => {
 
         try {
             const apiUrl = import.meta.env.VITE_API_URL || 'https://portfolio-backend-35po.onrender.com';
+            console.log('Sending to:', `${apiUrl}/api/contact`);
             const response = await fetch(`${apiUrl}/api/contact`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
             });
 
+            const data = await response.json();
+            console.log('Response:', data);
+
             if (response.ok) {
                 setStatus('Message Sent!');
                 setFormData({ name: '', email: '', message: '' });
             } else {
-                setStatus('Failed to send.');
+                setStatus(data.message || 'Failed to send.');
             }
         } catch (error) {
-            console.error(error);
-            setStatus('Error sending message.');
+            console.error('Error:', error);
+            setStatus('Error sending message. Check console for details.');
         }
     };
 

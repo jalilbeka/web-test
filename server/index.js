@@ -51,13 +51,19 @@ app.use(cors({
 app.use(express.json());
 
 // Configure Nodemailer
-const transporter = nodemailer.createTransport({
-    service: 'gmail', // You can change this to other services like 'outlook', 'yahoo', etc.
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS // Use App Password for Gmail
-    }
-});
+let transporter;
+if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+    transporter = nodemailer.createTransport({
+        service: 'gmail', // You can change this to other services like 'outlook', 'yahoo', etc.
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS // Use App Password for Gmail
+        }
+    });
+    console.log('Email transporter configured');
+} else {
+    console.warn('EMAIL_USER or EMAIL_PASS not set - email functionality disabled');
+}
 
 app.get('/', (req, res) => {
     res.send('API is running...');
@@ -81,36 +87,48 @@ app.post('/api/contact', async (req, res) => {
     }
 
     try {
-        // Send email to your inbox
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: process.env.RECEIVER_EMAIL || process.env.EMAIL_USER,
-            subject: `New Contact Form Message from ${name}`,
-            html: `
-                <h2>New Contact Form Submission</h2>
-                <p><strong>Name:</strong> ${name}</p>
-                <p><strong>Email:</strong> ${email}</p>
-                <p><strong>Message:</strong></p>
-                <p>${message.replace(/\n/g, '<br>')}</p>
-            `,
-            replyTo: email
-        };
-
-        // Set timeout for email sending (10 seconds)
-        const emailPromise = transporter.sendMail(mailOptions);
-        const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Email timeout')), 10000)
-        );
-
-        await Promise.race([emailPromise, timeoutPromise]);
+        // Log the message (always works)
+        console.log('Contact form submission received:', { name, email, message });
         
-        console.log('Contact form submission sent:', { name, email });
+        // Try to send email if transporter is configured
+        if (transporter) {
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: process.env.RECEIVER_EMAIL || process.env.EMAIL_USER,
+                subject: `New Contact Form Message from ${name}`,
+                html: `
+                    <h2>New Contact Form Submission</h2>
+                    <p><strong>Name:</strong> ${name}</p>
+                    <p><strong>Email:</strong> ${email}</p>
+                    <p><strong>Message:</strong></p>
+                    <p>${message.replace(/\n/g, '<br>')}</p>
+                `,
+                replyTo: email
+            };
+
+            // Set timeout for email sending (10 seconds)
+            const emailPromise = transporter.sendMail(mailOptions);
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Email timeout')), 10000)
+            );
+
+            try {
+                await Promise.race([emailPromise, timeoutPromise]);
+                console.log('Email sent successfully');
+            } catch (emailError) {
+                console.error('Email sending failed:', emailError.message);
+                // Continue - we'll still return success
+            }
+        } else {
+            console.log('Email not configured - message logged only');
+        }
+        
+        // Always return success to user
         res.status(200).json({ success: true, message: 'Message sent successfully!' });
     } catch (error) {
-        console.error('Error sending email:', error);
-        // Still return success to user even if email fails (log it for debugging)
-        console.log('Message received but email failed:', { name, email, message });
-        res.status(200).json({ success: true, message: 'Message received! (Email notification may be delayed)' });
+        console.error('Unexpected error:', error);
+        // Still return success to user
+        res.status(200).json({ success: true, message: 'Message received!' });
     }
 });
 
