@@ -24,22 +24,37 @@ app.use(limiter);
 const allowedOrigins = [
     process.env.FRONTEND_URL,
     'https://web-test-ebon-mu.vercel.app',
-    'http://localhost:5173'
+    'http://localhost:5173',
+    'https://web-test-ebon-mu.vercel.app/'
 ].filter(Boolean);
 
 app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-        // Check if origin matches any allowed origin
+        if (!origin) {
+            console.log('Request with no origin - allowing');
+            return callback(null, true);
+        }
+        
+        console.log('CORS check - Origin:', origin);
+        console.log('Allowed origins:', allowedOrigins);
+        
+        // Normalize origins (remove trailing slashes for comparison)
+        const normalizedOrigin = origin.replace(/\/$/, '');
         const isAllowed = allowedOrigins.some(allowed => {
-            return origin === allowed || origin.startsWith(allowed);
+            if (!allowed) return false;
+            const normalizedAllowed = allowed.replace(/\/$/, '');
+            return normalizedOrigin === normalizedAllowed || normalizedOrigin.startsWith(normalizedAllowed);
         });
-        if (isAllowed || process.env.NODE_ENV !== 'production') {
+        
+        // Also allow any vercel.app domain
+        const isVercel = origin.includes('.vercel.app');
+        
+        if (isAllowed || isVercel || process.env.NODE_ENV !== 'production') {
+            console.log('CORS allowed');
             callback(null, true);
         } else {
             console.log('CORS blocked origin:', origin);
-            console.log('Allowed origins:', allowedOrigins);
             callback(new Error('Not allowed by CORS'));
         }
     },
