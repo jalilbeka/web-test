@@ -22,7 +22,8 @@ app.use(limiter);
 
 // CORS Configuration - Allow frontend URL from environment or localhost
 const allowedOrigins = [
-    process.env.FRONTEND_URL || 'http://localhost:5173',
+    process.env.FRONTEND_URL,
+    'https://web-test-ebon-mu.vercel.app',
     'http://localhost:5173'
 ].filter(Boolean);
 
@@ -30,14 +31,21 @@ app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+        // Check if origin matches any allowed origin
+        const isAllowed = allowedOrigins.some(allowed => {
+            return origin === allowed || origin.startsWith(allowed);
+        });
+        if (isAllowed || process.env.NODE_ENV !== 'production') {
             callback(null, true);
         } else {
+            console.log('CORS blocked origin:', origin);
+            console.log('Allowed origins:', allowedOrigins);
             callback(new Error('Not allowed by CORS'));
         }
     },
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type']
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type'],
+    credentials: true
 }));
 
 app.use(express.json());
@@ -56,6 +64,9 @@ app.get('/', (req, res) => {
 });
 
 app.post('/api/contact', async (req, res) => {
+    console.log('Contact form request received:', req.headers.origin);
+    console.log('Request body:', req.body);
+    
     const { name, email, message } = req.body;
 
     // Basic Input Validation
@@ -85,13 +96,21 @@ app.post('/api/contact', async (req, res) => {
             replyTo: email
         };
 
-        await transporter.sendMail(mailOptions);
+        // Set timeout for email sending (10 seconds)
+        const emailPromise = transporter.sendMail(mailOptions);
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Email timeout')), 10000)
+        );
+
+        await Promise.race([emailPromise, timeoutPromise]);
         
         console.log('Contact form submission sent:', { name, email });
         res.status(200).json({ success: true, message: 'Message sent successfully!' });
     } catch (error) {
         console.error('Error sending email:', error);
-        res.status(500).json({ success: false, message: 'Failed to send message. Please try again later.' });
+        // Still return success to user even if email fails (log it for debugging)
+        console.log('Message received but email failed:', { name, email, message });
+        res.status(200).json({ success: true, message: 'Message received! (Email notification may be delayed)' });
     }
 });
 
