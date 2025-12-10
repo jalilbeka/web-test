@@ -10,9 +10,9 @@ const Hero = () => {
                     transition={{ duration: 1, ease: "easeOut" }}
                     className="text-6xl md:text-8xl font-black mb-4 tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-neonCyan via-white to-neonViolet drop-shadow-[0_0_10px_rgba(0,243,255,0.5)]"
                 >
-                    CREATIVE
+                    JALIL'S
                     <br />
-                    DEVELOPER
+                    PORTFOLIO
                 </motion.h1>
 
                 <motion.p
