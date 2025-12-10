@@ -89,20 +89,19 @@ const Contact = () => {
                     </div>
 
                     <div className="border-2 border-neonCyan rounded-lg p-1 bg-black/30 shadow-[0_0_20px_rgba(0,243,255,0.5)]">
-                        <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            type="submit"
-                            className="w-full bg-gradient-to-r from-neonCyan to-neonViolet text-black font-bold py-4 rounded-lg uppercase tracking-wider hover:opacity-90 transition-opacity relative overflow-hidden"
-                        >
-                            <span className="relative z-10">
-  <span className="text-black font-bold tracking-wider relative inline-block">
-    {status || 'SEND MESSAGE'}
-    {/* Subtle glow behind the text */}
-    <span className="absolute inset-0 text-transparent bg-clip-text bg-gradient-to-r from-neonCyan/60 to-neonViolet/60 blur-[2px] opacity-70"></span>
-  </span>
-</span>
-                        </motion.button>
+                        {/* PASTE THIS */}
+<motion.button
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+    type="submit"
+    className="w-full bg-gradient-to-r from-neonCyan to-neonViolet text-black font-bold py-4 rounded-lg uppercase tracking-wider hover:opacity-90 transition-opacity relative overflow-hidden"
+>
+    <span className="relative z-10">
+        <span className="text-white font-bold tracking-wider drop-shadow-[0_0_15px_rgba(0,243,255,0.9)]">
+            {status || 'SEND MESSAGE'}
+        </span>
+    </span>
+</motion.button>
                     </div>
                 </form>
             </motion.div>
